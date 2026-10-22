@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  mss301-catalog-postgres:
+    image: postgres:16-alpine
+    container_name: mss301-catalog-postgres
+    environment:
+      POSTGRES_DB: catalog_db
+      POSTGRES_USER: catalog_user
+      POSTGRES_PASSWORD: catalog_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - catalog_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U catalog_user -d catalog_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mss301-catalog-redis:
+    image: redis:7.2-alpine
+    container_name: mss301-catalog-redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - catalog_redis_data:/data
+
+volumes:
+  catalog_pg_data:
+  catalog_redis_data:
